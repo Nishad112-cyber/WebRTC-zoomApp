@@ -1,7 +1,8 @@
 import httpStatus from "http-status";
 import { User } from "../models/user.model.js";
 import bcrypt from "bcrypt";
-import crypto from "crypto";
+
+import jwt from "jsonwebtoken";
 
 //  LOGIN
 export const login = async (req, res) => {
@@ -34,10 +35,11 @@ export const login = async (req, res) => {
     }
 
     // generate token
-    const token = crypto.randomBytes(20).toString("hex");
-
-    user.token = token;
-    await user.save();
+    const token= jwt.sign(
+      {id : user._id},
+      process.env.JWT_SECRET,
+      {expiresIn : "1d"}
+    );
 
     return res.status(httpStatus.OK).json({
       token: token,
